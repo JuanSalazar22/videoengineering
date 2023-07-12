@@ -1,0 +1,55 @@
+version: "3"
+services:
+  gstreamer:
+    container_name: gstreamer
+    build:
+      context: ../containers
+      dockerfile: ../containers/gstreamer.dockerfile
+    image: videoengineering_gstreamer:latest
+    command: > 
+      gst-launch-1.0 -v 
+      videotestsrc pattern=snow name="decodebin_video_0" 
+      videotestsrc pattern=ball name="decodebin_video_1" 
+      videotestsrc pattern=smpte100 name="decodebin_video_2" 
+      audiotestsrc freq=200 name="decodebin_audio_1" 
+      audiotestsrc freq=1500 name="decodebin_audio_2" 
+      decodebin_video_0. ! video/x-raw ! queue name="src_0_decodebin_video_queue" ! clockoverlay 'time-format="%T %Z"' ! tee name="src_0_video_raw_tee" 
+      decodebin_video_1. ! video/x-raw ! queue name="src_1_decodebin_video_queue" ! clockoverlay 'time-format="%T %Z"' ! tee name="src_1_video_raw_tee" 
+      decodebin_video_2. ! video/x-raw ! queue name="src_3_decodebin_video_queue" ! clockoverlay 'time-format="%T %Z"' ! tee name="src_3_video_raw_tee" 
+      decodebin_audio_1. ! audio/x-raw ! queue name="src_5_decodebin_audio_queue" ! tee name="src_5_audio_raw_tee" 
+      decodebin_audio_2. ! audio/x-raw ! queue name="src_6_decodebin_audio_queue" ! tee name="src_6_audio_raw_tee" 
+      src_5_audio_raw_tee. ! queue name="src_5_audio_enc_queue" ! audioconvert ! audioresample ! audio/x-raw ! tee name="src_5_audio_resample_tee" 
+      src_6_audio_raw_tee. ! queue name="src_6_audio_enc_queue" ! audioconvert ! audioresample ! audio/x-raw ! tee name="src_6_audio_resample_tee" 
+      src_5_audio_resample_tee. ! queue ! audioconvert ! "audio/x-raw,channels=2" ! avenc_aac name="src_5_audio_encoder" ! "audio/mpeg" ! aacparse ! tee name="src_5_audio_encoder_tee" 
+      src_6_audio_resample_tee. ! queue ! audioconvert ! "audio/x-raw,channels=2" ! avenc_aac name="src_6_audio_encoder" ! "audio/mpeg" ! aacparse ! tee name="src_6_audio_encoder_tee" 
+      src_0_video_raw_tee. ! queue name="src_0_video_scale_queue" ! videoscale ! "video/x-raw,width=1920,height=1080" ! x264enc bitrate=1500 byte-stream=true key-int-max=30 bframes=0 aud=true tune=zerolatency pass=cbr ! "video/x-h264,profile=baseline,stream-format=byte-stream" ! h264parse ! tee name="src_0_video_transcoded_enc_tee" 
+      src_1_video_raw_tee. ! queue name="src_1_video_scale_queue" ! videoscale ! "video/x-raw,width=1920,height=1080" ! x264enc bitrate=1500 byte-stream=true key-int-max=30 bframes=0 aud=true tune=zerolatency pass=cbr ! "video/x-h264,profile=baseline,stream-format=byte-stream" ! h264parse ! tee name="src_1_video_transcoded_enc_tee" 
+      src_3_video_raw_tee. ! queue name="src_3_video_scale_queue" ! videoscale ! "video/x-raw,width=1920,height=1080" ! x264enc bitrate=1500 byte-stream=true key-int-max=30 bframes=0 aud=true tune=zerolatency pass=cbr ! "video/x-h264,profile=baseline,stream-format=byte-stream" ! h264parse ! tee name="src_3_video_transcoded_enc_tee" 
+      src_0_video_transcoded_enc_tee. ! queue name="src_0_video_transcoded_queue_mpegts" ! mpegtsmux m2ts-mode=false name="mpegts_mux_transcoded_0" ! tee name="mpegts_mux_transcoded_tee_0" 
+      src_1_video_transcoded_enc_tee. ! queue name="src_1_video_transcoded_queue_mpegts" ! mpegtsmux m2ts-mode=false name="mpegts_mux_transcoded_1" ! tee name="mpegts_mux_transcoded_tee_1" 
+      src_3_video_transcoded_enc_tee. ! queue name="src_3_video_transcoded_queue_mpegts" ! mpegtsmux m2ts-mode=false name="mpegts_mux_transcoded_3" ! tee name="mpegts_mux_transcoded_tee_3" 
+      src_5_audio_encoder_tee. ! queue ! mpegtsmux m2ts-mode=false name="mpegts_mux_transcoded_5" ! tee name="mpegts_mux_transcoded_tee_5" src_6_audio_encoder_tee. ! queue ! mpegts_mux_transcoded_5. 
+      mpegts_mux_transcoded_tee_0. ! queue ! udpsink host="225.225.225.225" port=5000 name="udp_broadcast_0" 
+      mpegts_mux_transcoded_tee_1. ! queue ! udpsink host="225.225.225.225" port=5001 name="udp_broadcast_1" 
+      mpegts_mux_transcoded_tee_3. ! queue ! udpsink host="225.225.225.225" port=5003 name="udp_broadcast_3" 
+      mpegts_mux_transcoded_tee_5. ! queue ! udpsink host="225.225.225.225" port=5005 name="udp_broadcast_5"
+  gpac-dash:
+    build:
+      context: ../containers
+      dockerfile: ../containers/gpac.dockerfile
+    image: videoengineering_gpac:latest
+    container_name: gpac-dash
+    depends_on:
+      - gstreamer
+    volumes:
+      - ".:/tmp/workdir"
+    command: [
+      "sh",
+      "-c",
+      "gpac \
+       -i udp://225.225.225.225:5000/:gpac:listen=true:tsprobe=true:#ASID=112:#Representation=10:#Language=af \
+       -i udp://225.225.225.225:5001/:gpac:listen=true:tsprobe=true:#ASID=100:#Representation=10:#Language=am \
+       -i udp://225.225.225.225:5003/:gpac:listen=true:tsprobe=true:#ASID=199:#Representation=10:#Language=arn \
+       -i udp://225.225.225.225:5005/:gpac:listen=true:tsprobe=true:#ASID=105 \
+       -o /tmp/workdir/content/playlist.mpd:buf=-100:segdur=2.0:cdur=0.2:asto=1.8:dmode=dynamic:cmaf=cmfc:profile=dashif.ll:utcs=https://time.akamai.com/?iso:pssh=mv:hmode=push",
+    ]
