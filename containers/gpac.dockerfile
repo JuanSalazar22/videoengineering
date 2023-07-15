@@ -117,8 +117,8 @@ RUN  \
     make -j && \
     make install
 
-RUN wget https://download.tsi.telecom-paristech.fr/gpac/new_builds/linux64/gpac/gpac_2.3-DEV-rev423-g609cba67-master_amd64.deb \
-    && dpkg -i --force-all gpac_2.3-DEV-rev423-g609cba67-master_amd64.deb
+RUN wget https://download.tsi.telecom-paristech.fr/gpac/new_builds/linux64/gpac/gpac_2.3-DEV-rev440-g21cbdfbe-master_amd64.deb \
+    && dpkg -i --force-all gpac_2.3-DEV-rev440-g21cbdfbe-master_amd64.deb
 
 RUN apt update \
     && apt --fix-broken -y install \
