@@ -3,9 +3,11 @@ services:
   gstreamer:
     container_name: gstreamer
     build:
-      context: ../containers
+      context: ../.
       dockerfile: ../containers/gstreamer.dockerfile
     image: videoengineering_gstreamer:latest
+    depends_on:
+      - origin
     command: >
       gst-launch-1.0 -v 
       videotestsrc pattern=snow name="decodebin_video_0" 
@@ -25,30 +27,13 @@ services:
       src_1_video_transcoded_enc_tee. ! queue name="src_1_video_transcoded_queue_mpegts" ! mpegts_mux_transcoded_0.
       src_3_video_transcoded_enc_tee. ! queue name="src_3_video_transcoded_queue_mpegts" ! mpegts_mux_transcoded_0.
       src_5_audio_encoder_tee. ! queue ! mpegts_mux_transcoded_0.
-      mpegts_mux_transcoded_tee_0. ! queue ! udpsink host="255.255.255.255" port=5000 name="udp_broadcast_0"
-#  gpac-dash:
-#    build:
-#      context: ../.
-#      dockerfile: ../containers/gpac.dockerfile
-#    image: videoengineering_gpac:latest
-#    container_name: gpac-dash
-#    depends_on:
-#      - gstreamer
-#    volumes:
-#      - ".:/tmp/workdir"
-#    command: [
-#      "sh",
-#      "-c",
-#      "gpac \
-#           -i udp://255.255.255.255:5000/:gpac:listen=true:tsprobe=true:#ASID=\\$$PID\\$$:#Representation=\\$$ServiceId\\$$ \
-#           -o /tmp/workdir/content/playlist.mpd:template=segment_$$(openssl rand -hex 5):buf=-100:segdur=2.0:cdur=0.2:asto=1.8:dmode=dynamic:cmaf=cmfc:profile=dashif.ll:utcs=https://time.akamai.com/?iso:pssh=mv:hmode=push",
-#    ]
-  gpac-hls:
+      mpegts_mux_transcoded_tee_0. ! queue ! udpsink host="225.225.225.225" port=5000 name="udp_broadcast_0"
+  gpac-dash:
     build:
       context: ../.
       dockerfile: ../containers/gpac.dockerfile
     image: videoengineering_gpac:latest
-    container_name: gpac-hls
+    container_name: gpac-dash
     depends_on:
       - gstreamer
     volumes:
@@ -57,9 +42,8 @@ services:
       "sh",
       "-c",
       "gpac \
-      -i udp://255.255.255.255:5000/:gpac:listen=true:tsprobe=true reframer:rt=on restamp \ 
-      -o /tmp/workdir/content/playlist.m3u8:gpac:buf=0:ll_part_hb=0:seg_sync=no:segdur=1.0:cdur=0.2:asto=1.8:llhls=sf:hlsc=true:cmaf=cmf2:dmode=dynamic:pssh=mv:hmode=push:template=segment_hls_$$(openssl rand -hex 5) -broken-cert \
-      -broken-cert",
+       -i udp://225.225.225.225:5000/:gpac:listen=true:tsprobe=true:#ASID=\\$$PID\\$$ \
+       -o /tmp/workdir/content/playlist.mpd:template=segment_$$(openssl rand -hex 5):buf=-100:segdur=2.0:cdur=0.2:asto=1.8:dmode=dynamic:cmaf=cmfc:profile=dashif.ll:utcs=https://time.akamai.com/?iso:pssh=mv:hmode=push",
     ]
   origin:
     build:

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<DataSet xmlns="http://tempuri.org/">
+  <xs:schema id="EZDRM" xmlns="" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xs:element name="EZDRM" msdata:IsDataSet="true" msdata:UseCurrentLocale="true">
+      <xs:complexType>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="WideVine">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="ContentID" type="xs:string" minOccurs="0" />
+                <xs:element name="Key" type="xs:string" minOccurs="0" />
+                <xs:element name="KeyHEX" type="xs:string" minOccurs="0" />
+                <xs:element name="KeyID" type="xs:string" minOccurs="0" />
+                <xs:element name="KeyIDGUID" type="xs:string" minOccurs="0" />
+                <xs:element name="KeyIDHEX" type="xs:string" minOccurs="0" />
+                <xs:element name="PSSH" type="xs:string" minOccurs="0" />
+                <xs:element name="ServerURL" type="xs:string" minOccurs="0" />
+                <xs:element name="ServerGet" type="xs:string" minOccurs="0" />
+                <xs:element name="ResponseRaw" type="xs:string" minOccurs="0" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="PlayReady">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="Key" type="xs:string" minOccurs="0" />
+                <xs:element name="KeyHEX" type="xs:string" minOccurs="0" />
+                <xs:element name="KeyIDGUID" type="xs:string" minOccurs="0" />
+                <xs:element name="LAURL" type="xs:string" minOccurs="0" />
+                <xs:element name="Checksum" type="xs:string" minOccurs="0" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <diffgr:diffgram xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:diffgr="urn:schemas-microsoft-com:xml-diffgram-v1">
+    <EZDRM xmlns="">
+      <WideVine diffgr:id="WideVine1" msdata:rowOrder="0" diffgr:hasChanges="inserted">
+        <ContentID>gstreamer_experimental</ContentID>
+        <Key>+r4g6tmGF/WXSQLaje6HjQ==</Key>
+        <KeyHEX>fabe20ead98617f5974902da8dee878d</KeyHEX>
+        <KeyID>OJMRd6GO9yI4HkOQ4vZDRw==</KeyID>
+        <KeyIDGUID>38931177-a18e-f722-381e-4390e2f64347</KeyIDGUID>
+        <KeyIDHEX>38931177a18ef722381e4390e2f64347</KeyIDHEX>
+        <PSSH>EhA4kxF3oY73IjgeQ5Di9kNHGgVlemRybUjj3JWbBg==</PSSH>
+        <ServerURL>https://widevine-dash.ezdrm.com/proxy?pX=03B9F8</ServerURL>
+        <ResponseRaw>{"status":"OK","drm":[{"type":"WIDEVINE","system_id":"edef8ba979d64acea3c827dcd51d21ed"}],"tracks":[{"type":"SD","key_id":"OJMRd6GO9yI4HkOQ4vZDRw==","key":"+r4g6tmGF/WXSQLaje6HjQ==","pssh":[{"drm_type":"WIDEVINE","data":"EhA4kxF3oY73IjgeQ5Di9kNHGgVlemRybUjj3JWbBg=="}],"entitled_key":[],"content_groups":[],"feature":""}]}</ResponseRaw>
+      </WideVine>
+      <PlayReady diffgr:id="PlayReady1" msdata:rowOrder="0" diffgr:hasChanges="inserted">
+        <Key>+r4g6tmGF/WXSQLaje6HjQ==</Key>
+        <KeyHEX>fabe20ead98617f5974902da8dee878d</KeyHEX>
+        <KeyIDGUID>38931177-a18e-f722-381e-4390e2f64347</KeyIDGUID>
+        <LAURL>https://playready.ezdrm.com/cency/preauth.aspx?pX=24713F</LAURL>
+        <Checksum>ZWKvYWPeNp0=</Checksum>
+      </PlayReady>
+    </EZDRM>
+  </diffgr:diffgram>
+</DataSet>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GPACDRM type="CENC AES-CTR">
+    <!--  Change the version (You can see the version in the site)-->
+    <DRMInfo type="pssh" version="0">
+        <!-- System IDs: https://dashif.org/identifiers/content_protection/ -->
+        <!-- Widevine EDEF8BA979D64ACEA3C827DCD51D21ED -->
+        <!-- Playready 9A04F07998404286AB92E65BE0885F95 -->
+        <BS ID128="EDEF8BA979D64ACEA3C827DCD51D21ED" />
+
+        <!-- PSSH value from the WideVine object in the EZDRM XML -->
+        <BS data64="EhA4kxF3oY73IjgeQ5Di9kNHGgVlemRybUjj3JWbBg==" />
+    </DRMInfo>
+    <CrypTrack first_IV="0x0000000000000001">
+        <!-- KeyIDHEX and KeyHEX values in the Widevine object in the EZDRM XML. Prepend 0x prefix -->
+        <key KID="0xfabe20ead98617f5974902da8dee878d" value="0xfabe20ead98617f5974902da8dee878d" />
+    </CrypTrack>
+</GPACDRM>
